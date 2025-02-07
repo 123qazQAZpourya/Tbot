@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Input with Firebase</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #212121;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #333;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease-in-out;
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: bold;
+            color: #FF4081;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 18px;
+            color: #bbb;
+        }
+        .input-box {
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background-color: #444;
+            color: #fff;
+            width: 100%;
+            font-size: 16px;
+            text-align: center;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease-in-out;
+        }
+        .input-box.error {
+            border-color: #e74c3c;
+        }
+        .input-box:focus {
+            outline: none;
+            border-color: #FF4081;
+        }
+        .submit-btn, .restart-btn {
+            padding: 12px 25px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn {
+            background-color: #FF4081;
+            color: white;
+        }
+        .submit-btn.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .submit-btn:hover:not(.disabled) {
+            background-color: #e91e63;
+        }
+        .restart-btn {
+            background-color: #4CAF50;
+            display: none;
+        }
+        .restart-btn:hover {
+            background-color: #388e3c;
+        }
+        .checkbox-label {
+            margin-left: 10px;
+            font-size: 14px;
+            color: #ccc;
+        }
+        .error-message, .success-message {
+            display: none;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .error-message {
+            color: #e74c3c;
+        }
+        .success-message {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .input-box-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .input-box-group-nums {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .input-box-group-nums .input-box {
+            width: 80px;
+            margin: 10px;
+            font-size: 18px;
+            height: 45px;
+            background-color: #444;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .input-box-group-nums .input-box {
+            font-size: 18px;
+            height: 45px;
+        }
+        .input-box-group-nums .input-box:focus {
+            border-color: #FF4081;
+        }
+        .terms-link {
+            color: #FF4081;
+            text-decoration: none;
+        }
+        .terms-link:hover {
+            text-decoration: underline;
+        }
+        /* Custom styling for terms and conditions */
+        .terms-popup {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            color: #fff;
+            max-width: 500px;
+            width: 100%;
+            margin: 20px auto;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .terms-header {
+            font-size: 24px;
+            color: #FF4081;
+            margin-bottom: 20px;
+        }
+        .terms-body {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .close-terms {
+            background-color: #F44336;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+        }
+        .close-terms:hover {
+            background-color: #c1351d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>Robin Hood</h1>
+            <h2 id="competition-title"> Ticket of Netflix Game</h2>
+        </div>
+        
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message">Registration successful!</div>
+
+        <div class="input-box-group">
+            <input id="email" class="input-box" type="email" placeholder="Email" />
+            <input id="name" class="input-box" type="text" placeholder="Name" />
+        </div>
+        
+        <p>Guess Numbers (1 to 52):</p>
+        
+        <div class="input-box-group-nums">
+            <input id="box1" class="input-box" type="number" min="1" max="52" placeholder="1" />
+            <input id="box2" class="input-box" type="number" min="1" max="52" placeholder="2" />
+            <input id="box3" class="input-box" type="number" min="1" max="52" placeholder="3" />
+            <input id="box4" class="input-box" type="number" min="1" max="52" placeholder="4" />
+            <input id="box5" class="input-box" type="number" min="1" max="52" placeholder="5" />
+            <input id="box6" class="input-box" type="number" min="1" max="52" placeholder="6" />
+        </div>
+
+        <div>
+            <input id="terms-checkbox" type="checkbox" />
+            <label for="terms-checkbox" class="checkbox-label">
+                I agree to the <a href="#" id="terms-link" class="terms-link">terms and conditions</a>
+            </label>
+        </div>
+
+        <button id="submit-btn" class="submit-btn" disabled>Submit</button>
+        <button id="restart-btn" class="restart-btn">Restart</button>
+    </div>
+
+    <!-- Terms and Conditions Popup -->
+    <div id="terms-popup" class="terms-popup">
+        <div class="terms-header">Terms and Conditions</div>
+        <div class="terms-body">
+            <p><strong>1. Each email can only have one ticket per game.</strong></p>
+            <p><strong>2. If multiple tickets are registered with the same email, only the last ticket will be considered.</strong></p>
+            <p><strong>3. Winners will be notified via the email they registered.</strong></p>
+        </div>
+        <button class="close-terms">Close</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQ75g7jx5ECs5vbL_MPCoC8hh9n5iq7d4",
+            authDomain: "robinhoodads-ceed0.firebaseapp.com",
+            databaseURL: "https://robinhoodads-ceed0-default-rtdb.firebaseio.com",
+            projectId: "robinhoodads-ceed0",
+            storageBucket: "robinhoodads-ceed0.firebasestorage.app",
+            messagingSenderId: "860537204555",
+            appId: "1:860537204555:web:a511faf133bdd1a354c2ce",
+            measurementId: "G-P96TVKX40L"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Enable or disable submit button based on checkbox
+        document.getElementById('terms-checkbox').addEventListener('change', function() {
+            const submitBtn = document.getElementById('submit-btn');
+            if (this.checked) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('disabled');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('disabled');
+            }
+        });
+
+        // Show terms and conditions
+        document.getElementById('terms-link').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('terms-popup').style.display = 'block';
+        });
+
+        // Close terms and conditions popup
+        document.querySelector('.close-terms').addEventListener('click', function() {
+            document.getElementById('terms-popup').style.display = 'none';
+        });
+
+        // Handle form submission
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+            const competitionTitle = document.getElementById('competition-title').textContent;
+            const numbers = [];
+            let allValid = true;
+
+            // Validate email and name
+            if (!email || !validateEmail(email)) {
+                allValid = false;
+                document.getElementById('error-message').textContent = "Please enter a valid email.";
+            } else if (!name) {
+                allValid = false;
+                document.getElementById('error-message').textContent = "Please enter a name.";
+            }
+
+            // Collect numbers from boxes and validate them
+            for (let i = 1; i <= 6; i++) {
+                const number = document.getElementById(`box${i}`).value;
+                if (number < 1 || number > 52 || numbers.includes(number)) {
+                    allValid = false;
+                    document.getElementById(`box${i}`).classList.add('error');
+                } else {
+                    numbers.push(number);
+                    document.getElementById(`box${i}`).classList.remove('error');
+                }
+            }
+
+            // If validation passes, send data to Firebase
+            if (allValid) {
+                document.getElementById('error-message').style.display = 'none';
+                document.getElementById('success-message').style.display = 'block';
+                document.getElementById('submit-btn').disabled = true;
+                document.getElementById('submit-btn').classList.add('disabled');
+                document.getElementById('restart-btn').style.display = 'inline-block';
+
+                // Disable all inputs
+                document.querySelectorAll('.input-box').forEach(input => input.disabled = true);
+                document.getElementById('terms-checkbox').disabled = true;
+
+                // Send to Firebase
+		push(ref(db, 'submissions'), {
+  		  email: email,
+  		  name: name,
+   		 competitionTitle: competitionTitle, // این خط اضافه شد
+   		 numbers: numbers
+		});
+
+
+            } else {
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+            }
+        });
+
+        // Restart the form
+        document.getElementById('restart-btn').addEventListener('click', function() {
+            document.getElementById('email').value = '';
+            document.getElementById('name').value = '';
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`box${i}`).value = '';
+                document.getElementById(`box${i}`).classList.remove('error');
+            }
+            document.getElementById('submit-btn').disabled = false;
+            document.getElementById('submit-btn').classList.remove('disabled');
+            document.getElementById('success-message').style.display = 'none';
+            document.getElementById('restart-btn').style.display = 'none';
+            document.getElementById('terms-checkbox').checked = false;
+            document.getElementById('terms-checkbox').disabled = false;
+            document.getElementById('error-message').style.display = 'none';
+
+            // Enable all inputs
+            document.querySelectorAll('.input-box').forEach(input => input.disabled = false);
+        });
+
+        function validateEmail(email) {
+            const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return re.test(email);
+        }
+    </script>
+</body>
+</html>
